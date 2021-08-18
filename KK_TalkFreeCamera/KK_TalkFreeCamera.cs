@@ -27,11 +27,11 @@ namespace KK_TalkFreeCamera
             if (icon == null)
                 return;
             
-            GameAPI.AddTouchIcon(icon, button => button.onClick.AddListener(ToggleCamera));
+            GameAPI.AddTouchIcon(icon, button => button.onClick.AddListener(ToggleCameraMode));
             Harmony.CreateAndPatchAll(typeof(KK_TalkFreeCamera));
         }
         
-        private static void ToggleCamera()
+        private static void ToggleCameraMode()
         {
             if (ccv2 == null || talkScene == null)
                 return;
