@@ -5,7 +5,7 @@ This plugin allows you to have a free camera view in Talk Scenes.
 # DO NOT REUPLOAD WITHOUT PERMISSION | 未经许可请勿转载
 
 **Usage:**  
-* Enter a TalkScene.
+* Start a conversation in roaming mode.
 * Click the new Camera icon next to the touch icons.
 
 **Download:**  
