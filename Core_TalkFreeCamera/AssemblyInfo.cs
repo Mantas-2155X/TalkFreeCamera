@@ -4,14 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("KK_TalkFreeCamera")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Mantas-2155X aka 2155X")]
-[assembly: AssemblyProduct("KK_TalkFreeCamera")]
+[assembly: AssemblyTitle(KK_TalkFreeCamera.TalkFreeCameraPlugin.PluginName)]
+[assembly: AssemblyDescription("Adds free camera mode to talk scenes")]
+[assembly: AssemblyCompany("https://github.com/Mantas-2155X/KK_TalkFreeCamera")]
+[assembly: AssemblyProduct(KK_TalkFreeCamera.TalkFreeCameraPlugin.PluginName)]
 [assembly: AssemblyCopyright("Mantas-2155X aka 2155X Copyright ©  2021")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -31,5 +28,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion(KK_TalkFreeCamera.KK_TalkFreeCamera.VERSION)]
-[assembly: AssemblyFileVersion(KK_TalkFreeCamera.KK_TalkFreeCamera.VERSION)]
+[assembly: AssemblyVersion(KK_TalkFreeCamera.TalkFreeCameraPlugin.Version)]
+[assembly: AssemblyFileVersion(KK_TalkFreeCamera.TalkFreeCameraPlugin.Version)]
