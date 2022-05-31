@@ -1,17 +1,18 @@
-﻿using System.Reflection;
-
+﻿using System;
 using BepInEx;
-using HarmonyLib;
 using KKAPI;
 using KKAPI.MainGame;
 using KKAPI.Utilities;
-
+using UniRx;
+using UniRx.Triggers;
 using UnityEngine;
 
 namespace KK_TalkFreeCamera
 {
     [BepInProcess(KoikatuAPI.GameProcessName)]
+#if KK
     [BepInProcess(KoikatuAPI.GameProcessNameSteam)]
+#endif
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     [BepInPlugin(GUID, PluginName, Version)]
     public class TalkFreeCameraPlugin : BaseUnityPlugin
@@ -20,27 +21,45 @@ namespace KK_TalkFreeCamera
         public const string PluginName = "TalkFreeCamera";
         public const string Version = "1.0.0";
 
-        private static TalkScene talkScene;
-        private static SaveData.Heroine heroine;
-        private static CameraControl_Ver2 ccv2;
+        private IDisposable cleanup;
+#if DEBUG // Hot reload
+        private void OnDestroy() => cleanup.Dispose();
+#endif
 
         private void Awake()
         {
             var icon = ResourceUtils.GetEmbeddedResource("cam.png", typeof(TalkFreeCameraPlugin).Assembly).LoadTexture().ToSprite();
-            GameAPI.AddTouchIcon(icon, button => button.onClick.AddListener(ToggleCameraMode));
-
-            Harmony.CreateAndPatchAll(typeof(TalkFreeCameraPlugin), GUID);
+            cleanup = GameAPI.AddTouchIcon(icon, button => button.onClick.AddListener(ToggleCameraMode), 1, -420);
         }
 
-        private static void ToggleCameraMode()
+        private void ToggleCameraMode()
         {
             var talkScene = GameAPI.GetTalkScene();
-            if (ccv2 == null || talkScene == null)
+            if (talkScene == null)
                 return;
-
-            heroine = talkScene.targetHeroine;
+#if KKS
+            if (!TalkScene.isPaly)
+                return;
+#endif
+            var heroine = talkScene.targetHeroine;
             if (heroine == null)
                 return;
+
+            var maincamGo = Camera.main.gameObject;
+            var ccv2 = maincamGo.GetComponent<CameraControl_Ver2>();
+            if (ccv2 == null)
+            {
+                Logger.LogDebug("Adding CameraControl_Ver2 to: " + maincamGo.GetFullPath());
+                ccv2 = maincamGo.AddComponent<CameraControl_Ver2>();
+                ccv2.enabled = false;
+
+                // Clean up after talk scene ends
+#if KK          // In KK it's destroyed
+                talkScene.OnDestroyAsObservable().Subscribe(_ => Destroy(ccv2));
+#else           // In KKS it's only disabled and always kept loaded
+                talkScene.cancellation.Token.Register(() => Destroy(ccv2));
+#endif
+            }
 
             ccv2.enabled = !ccv2.enabled;
 
@@ -48,33 +67,6 @@ namespace KK_TalkFreeCamera
                 ccv2.TargetSet(heroine.chaCtrl.objHead.transform, true);
             else
                 ccv2.Reset(1);
-        }
-        
-        [HarmonyPostfix, HarmonyPatch(typeof(TalkScene), "Awake")]
-        private static void TalkScene_Awake_Postfix(TalkScene __instance)
-        {
-            talkScene = __instance;
-
-            if (Camera.main == null)
-                return;
-
-            ccv2 = Camera.main.gameObject.AddComponent<CameraControl_Ver2>();
-            if (ccv2 == null)
-                return;
-
-            ccv2.enabled = false;
-        }
-
-        [HarmonyPrefix, HarmonyPatch(typeof(TalkScene), "OnDestroy")]
-        private static void TalkScene_OnDestroy_Prefix()
-        {
-            if (ccv2 == null)
-                return;
-
-            Destroy(ccv2);
-
-            heroine = null;
-            ccv2 = null;
         }
     }
 }
