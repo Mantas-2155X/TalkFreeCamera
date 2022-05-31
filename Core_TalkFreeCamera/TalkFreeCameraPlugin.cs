@@ -49,15 +49,20 @@ namespace KK_TalkFreeCamera
             var ccv2 = maincamGo.GetComponent<CameraControl_Ver2>();
             if (ccv2 == null)
             {
-                Logger.LogDebug("Adding CameraControl_Ver2 to: " + maincamGo.GetFullPath());
+                Logger.LogInfo("Adding CameraControl_Ver2 to: " + maincamGo.GetFullPath());
                 ccv2 = maincamGo.AddComponent<CameraControl_Ver2>();
                 ccv2.enabled = false;
-
+                
                 // Clean up after talk scene ends
+                void Cleanup()
+                {
+                    Logger.LogInfo("Removing added CameraControl_Ver2");
+                    Destroy(ccv2);
+                }
 #if KK          // In KK it's destroyed
-                talkScene.OnDestroyAsObservable().Subscribe(_ => Destroy(ccv2));
+                talkScene.OnDestroyAsObservable().Subscribe(_ => Cleanup());
 #else           // In KKS it's only disabled and always kept loaded
-                talkScene.cancellation.Token.Register(() => Destroy(ccv2));
+                talkScene.cancellation.Token.Register(Cleanup);
 #endif
             }
 
